@@ -1,0 +1,26 @@
+{
+  "required_api_version": "^2.0.0",
+  "name": "Wiki Search",
+  "description": "Search and open MediaWiki pages right in your browser",
+  "developer_name": "Krzysztof Saczuk",
+  "icon": "images/icon.svg",
+  "options": {
+    "query_debounce": 1
+  },
+  "preferences": [
+    {
+      "id": "global_keyword",
+      "type": "keyword",
+      "name": "Global keyword",
+      "description": "Global keyword used by the extension",
+      "default_value": "wiki"
+    },
+    {
+      "id": "wiki_urls",
+      "type": "text",
+      "name": "Wiki URLs",
+      "description": "List of wikis urls that you want to search. Example format: https://en.wikipedia.org/ | https://witcher.fandom.com/",
+      "default_value": "https://en.wikipedia.org/ | https://witcher.fandom.com/"
+    }
+  ]
+}
