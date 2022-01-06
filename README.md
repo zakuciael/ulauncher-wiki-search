@@ -33,6 +33,13 @@ open <a href="https://www.mediawiki.org/wiki/MediaWiki" target="_blank">MediaWik
 - Ulauncher 5
 - Python 3
 
+#### Packages
+
+- validators >= 0.18.2
+- beautifulsoup4 >= 4.10.0
+- requests >= 2.27.1
+- dotmap >= 1.3.26
+
 To install this extension:
 
 1. Install required packages
