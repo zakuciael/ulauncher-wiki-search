@@ -8,9 +8,11 @@ import requests
 import validators
 from bs4 import BeautifulSoup
 from ulauncher.api.client.Extension import Extension
+from ulauncher.api.shared.event import KeywordQueryEvent
 
 from data import MEDIA_WIKI_DETECTION_REGEXES_META, MEDIA_WIKI_DETECTION_REGEXES_CONTENT, \
     COMMON_API_ENDPOINTS, KNOWN_API_ENDPOINTS, MEDIA_WIKI_USER_AGENT
+from events.KeywordQueryEventListener import KeywordQueryEventListener
 
 
 class WikiSearchExtension(Extension):
@@ -19,6 +21,7 @@ class WikiSearchExtension(Extension):
     def __init__(self):
         """ Initializes the extension """
         super().__init__()
+        self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
     @staticmethod
     def get_base_icon():
