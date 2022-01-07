@@ -11,20 +11,26 @@ from bs4 import BeautifulSoup
 # noinspection PyPep8Naming
 from mwclient import Site as API
 from ulauncher.api.client.Extension import Extension
-from ulauncher.api.shared.event import KeywordQueryEvent
+from ulauncher.api.shared.event import KeywordQueryEvent, PreferencesUpdateEvent, PreferencesEvent
 
 from data import MEDIA_WIKI_DETECTION_REGEXES_META, MEDIA_WIKI_DETECTION_REGEXES_CONTENT, \
     COMMON_API_ENDPOINTS, KNOWN_API_ENDPOINTS, MEDIA_WIKI_USER_AGENT
 from events.KeywordQueryEventListener import KeywordQueryEventListener
+from events.PreferencesEventListener import PreferencesEventListener
+from events.PreferencesUpdateEventListener import PreferencesUpdateEventListener
 
 
 class WikiSearchExtension(Extension):
     """ Main Extension Class  """
 
+    _apis: dict[str, API] = {}
+
     def __init__(self):
         """ Initializes the extension """
         super().__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+        self.subscribe(PreferencesEvent, PreferencesEventListener())
+        self.subscribe(PreferencesUpdateEvent, PreferencesUpdateEventListener())
 
     @staticmethod
     def get_base_icon():
@@ -153,6 +159,47 @@ class WikiSearchExtension(Extension):
                 return self._url_to_api(url)
 
         return None
+
+    def parse_wiki_urls(self, raw_wiki_urls: str) -> None:
+        """
+        Parses raw list of wiki urls and adds them to the list
+        :param raw_wiki_urls: Raw list of wiki urls
+        """
+
+        if not raw_wiki_urls:
+            return
+
+        self.logger.info("Parsing wiki urls...")
+        matches = list(filter(None, [self._parse_url(raw_url.strip()) for raw_url in
+                                     re.findall(r"(?: *\| *)?(\S+)", raw_wiki_urls)]))
+
+        endpoints: list[API] = []
+
+        for url in matches:
+            self.logger.debug("Resolving API endpoint for %s", url.netloc)
+
+            if self._apis.get(url.netloc):
+                endpoint = cast(API, self._apis.get(url.netloc))
+                endpoints.append(endpoint)
+                self.logger.debug("API endpoint found in cache: hostname=%s scheme=%s, path=%s",
+                                  endpoint.host, endpoint.scheme, endpoint.path)
+                continue
+
+            endpoint = self._get_api(url)
+            if endpoint:
+                endpoints.append(endpoint)
+                self.logger.debug("Resolved API endpoint: hostname=%s scheme=%s, path=%s",
+                                  endpoint.host, endpoint.scheme, endpoint.path)
+                continue
+
+            self.logger.warning("Unable to resolve API endpoint for %s", url.netloc)
+
+        self._apis = {}
+        for endpoint in endpoints:
+            self._apis[endpoint.host] = endpoint
+
+        self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
+        print(self._apis)
 
 
 if __name__ == "__main__":
