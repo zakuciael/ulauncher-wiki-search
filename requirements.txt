@@ -1,3 +1,5 @@
 validators~=0.18.2
 beautifulsoup4~=4.10.0
 requests~=2.27.1
+cachetools~=5.0.0
+mwclient~=0.10.1

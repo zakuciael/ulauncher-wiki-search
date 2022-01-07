@@ -2,11 +2,14 @@
 import os
 import re
 from typing import cast
-from urllib.parse import urlparse, ParseResult
+# noinspection PyPep8Naming
+from urllib.parse import ParseResult as URL, urlparse
 
 import requests
 import validators
 from bs4 import BeautifulSoup
+# noinspection PyPep8Naming
+from mwclient import Site as API
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.shared.event import KeywordQueryEvent
 
@@ -37,6 +40,38 @@ class WikiSearchExtension(Extension):
         return path
 
     @staticmethod
+    def _parse_url(raw_url: str) -> URL | None:
+        """
+        Validates and parses provided URL
+        :param raw_url: URL to parse
+        :return: Parsed URL or None if invalid
+        """
+
+        # Add dummy "http" schema in front of the URL if it starts with "//" to support RFC 1808
+        if validators.url("http:" + raw_url if re.match(r"^//", raw_url) else raw_url):
+            return urlparse(raw_url)
+        if validators.domain(raw_url):
+            return urlparse("//" + raw_url)
+
+        return None
+
+    @staticmethod
+    def _url_to_api(url: URL) -> API:
+        """
+        Converts URL into MediaWiki API object
+        :param url: URL to convert
+        :return: MediaWiki API object
+        """
+
+        return API(
+            host=url.netloc,
+            scheme=url.scheme,
+            path=url.path,
+            clients_useragent=MEDIA_WIKI_USER_AGENT,
+            force_login=False
+        )
+
+    @staticmethod
     def _request(url: str, params=None, **kwargs):
         r"""
         Wrapper for the `requests.get` method
@@ -53,23 +88,12 @@ class WikiSearchExtension(Extension):
                             headers={"user-agent": MEDIA_WIKI_USER_AGENT})
 
     # noinspection PyProtectedMember
-    def get_api_url(self, raw_url: str) -> ParseResult | None:
+    def _get_api(self, url: URL) -> API | None:
         """
-        Resolves API endpoint from the provided raw URL/Hostname
-        :param raw_url: Raw MediaWiki URL/Hostname
-        :return: API endpoint or None if not resolved
+        Resolves MediaWiki API from the provided url
+        :param url: URL pointing to the MediaWiki site
+        :return: MediaWiki API or None if not resolved
         """
-
-        url: ParseResult | None = None
-
-        # Add dummy "http" schema in front of the URL if it starts with "//" to support RFC 1808
-        if validators.url("http:" + raw_url if re.match(r"^//", raw_url) else raw_url):
-            url = urlparse(raw_url)
-        elif validators.domain(raw_url):
-            url = urlparse("//" + raw_url)
-
-        if not url:
-            return None
 
         # If there is no scheme specified set it as "http" and relay on the https redirect
         if not url.scheme:
@@ -111,7 +135,7 @@ class WikiSearchExtension(Extension):
 
         if known_api_endpoint:
             url = url._replace(path=known_api_endpoint.path)
-            return url
+            return self._url_to_api(url)
 
         # Otherwise, check common API endpoints and try to determine the valid one
         for common_endpoint in COMMON_API_ENDPOINTS:
@@ -126,7 +150,7 @@ class WikiSearchExtension(Extension):
             content_type = res.headers.get("content-type")
             if res.ok and "application/json" in (content_type or "") and \
                     not res.json().get("error"):
-                return url
+                return self._url_to_api(url)
 
         return None
 
