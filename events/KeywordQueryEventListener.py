@@ -28,7 +28,7 @@ class KeywordQueryEventListener(EventListener):
         """
 
         query = event.get_argument()
-        results = ResultList(query or "", min_score=60, limit=8)
+        results = ResultList(query or "", limit=8)
 
         if query:
             results.extend(extension.search(query))
