@@ -43,7 +43,7 @@ class KeywordQueryEventListener(EventListener):
             results.append(
                 ExtensionResultItem(
                     name=page.title,
-                    description=page.description,
+                    description=f"{page.wiki.site['sitename']} - {page.description}",
                     icon=extension.get_base_icon(),
                     on_enter=OpenUrlAction(page.to_url())
                 )
