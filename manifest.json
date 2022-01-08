@@ -21,6 +21,23 @@
       "name": "Wiki URLs",
       "description": "List of wikis urls that you want to search. Example format: https://en.wikipedia.org/ | https://witcher.fandom.com/",
       "default_value": "https://en.wikipedia.org/ | https://witcher.fandom.com/"
+    },
+    {
+      "id": "advanced_results",
+      "type": "select",
+      "name": "Advanced results",
+      "description": "If enabled search results will be additionally parsed to resolve better descriptions and page icons.",
+      "default_value": "True",
+      "options": [
+        {
+          "value": "True",
+          "text": "Enabled"
+        },
+        {
+          "value": "False",
+          "text": "Disabled"
+        }
+      ]
     }
   ]
 }

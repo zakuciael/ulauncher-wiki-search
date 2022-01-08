@@ -20,6 +20,10 @@ class PreferencesUpdateEventListener(EventListener):
         :param extension: Extension class
         """
 
-        extension.preferences[event.id] = event.new_value
         if event.id == "wiki_urls":
             extension.parse_wiki_urls(event.new_value)
+
+        if event.id == "advanced_results":
+            event.new_value = event.new_value == "True"
+
+        extension.preferences[event.id] = event.new_value
