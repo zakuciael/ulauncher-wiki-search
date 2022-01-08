@@ -15,6 +15,7 @@ from ulauncher.api.shared.event import KeywordQueryEvent, PreferencesUpdateEvent
 
 from data import MEDIA_WIKI_DETECTION_REGEXES_META, MEDIA_WIKI_DETECTION_REGEXES_CONTENT, \
     COMMON_API_ENDPOINTS, KNOWN_API_ENDPOINTS, MEDIA_WIKI_USER_AGENT
+from data.WikiPage import WikiPage
 from events.KeywordQueryEventListener import KeywordQueryEventListener
 from events.PreferencesEventListener import PreferencesEventListener
 from events.PreferencesUpdateEventListener import PreferencesUpdateEventListener
@@ -135,6 +136,8 @@ class WikiSearchExtension(Extension):
 
         # Final part, let's resolve the actual API endpoint
 
+        # TODO: Resolve user supplied path
+
         # First let's check common websites
         known_api_endpoint = next(endpoint_data for endpoint_data in KNOWN_API_ENDPOINTS if
                                   endpoint_data.regex.match(cast(str, url.hostname)))
@@ -199,7 +202,56 @@ class WikiSearchExtension(Extension):
             self._apis[endpoint.host] = endpoint
 
         self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
-        print(self._apis)
+
+    def search(self, query: str) -> list[WikiPage]:
+        """
+        Searches wikis for the query and returns combined results from all of them
+        :param query: Text to search
+        :param limit: Limit of results per website
+        :return: Combined results
+        """
+
+        items = []
+        for wiki in self._apis.values():
+            result = wiki.get(
+                # Basic Options
+                action="query",
+                prop="pageprops|extracts|info",
+                generator="search",
+                # Page Props Options
+                ppprop="description|displaytitle",
+                # Info Options
+                inprop="displaytitle",
+                # Extracts Options
+                exsentences=3,
+                exintro=True,
+                explaintext=True,
+                exsectionformat="raw",
+                # Generator Options
+                gsrsearch=query,
+                gsrlimit=5
+            )
+
+            if not result["query"] or not result["query"]["pages"]:
+                continue
+
+            pages = cast(dict, result["query"]["pages"]).values()
+
+            for page in pages:
+                wiki_page = WikiPage(
+                    wiki=wiki,
+                    page_id=cast(int, page['pageid']),
+                    title=cast(str, page["title"]),
+                    display_title=cast(str, page["displaytitle"]),
+                    extract=cast(str, page["extract"])
+                )
+
+                if self.preferences["advanced_results"]:
+                    wiki_page.to_advanced()
+
+                items.append(wiki_page)
+
+        return items
 
 
 if __name__ == "__main__":
