@@ -32,7 +32,7 @@ class WikiPage:
         self.display_title = display_title
         self.description = self._escape_formatting(extract)
 
-        if self.description == "...":
+        if not self.description or self.description == "...":
             self.description = "No description"
 
     @staticmethod
