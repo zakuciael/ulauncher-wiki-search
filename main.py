@@ -225,7 +225,7 @@ class WikiSearchExtension(Extension):
                 # Info Options
                 inprop="displaytitle",
                 # Extracts Options
-                exchars=50,
+                exchars=40,
                 exintro=True,
                 explaintext=True,
                 exsectionformat="raw",
@@ -241,13 +241,20 @@ class WikiSearchExtension(Extension):
             pages = cast(dict, result["query"]["pages"]).values()
 
             for page in pages:
-                items.append(WikiPage(
-                    wiki=wiki,
-                    page_id=cast(int, page['pageid']),
-                    title=cast(str, page["title"]),
-                    display_title=cast(str, page["displaytitle"]),
-                    extract=cast(str, page["extract"])
-                ))
+                title = cast(str, page["title"])
+
+                if title == cast(str, wiki.site["mainpage"]):
+                    continue
+
+                items.append(
+                    WikiPage(
+                        wiki=wiki,
+                        page_id=cast(int, page['pageid']),
+                        title=title,
+                        display_title=cast(str, page["displaytitle"]),
+                        extract=cast(str, page["extract"])
+                    )
+                )
 
         return items
 
