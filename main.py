@@ -204,6 +204,8 @@ class WikiSearchExtension(Extension):
         for endpoint in endpoints:
             self._apis[endpoint.host] = endpoint
 
+        self._cache.clear()
+
         self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
 
     @cachedmethod(lambda self: self._cache, lambda self, query: hashkey(query.lower().strip()))
