@@ -9,6 +9,7 @@ import requests
 import validators
 from bs4 import BeautifulSoup
 # noinspection PyPep8Naming
+from cachetools import LRUCache, cachedmethod
 from mwclient import Site as API
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.shared.event import KeywordQueryEvent, PreferencesUpdateEvent, PreferencesEvent
@@ -25,6 +26,7 @@ class WikiSearchExtension(Extension):
     """ Main Extension Class  """
 
     _apis: dict[str, API] = {}
+    _cache: LRUCache = LRUCache(maxsize=32)
 
     def __init__(self):
         """ Initializes the extension """
@@ -203,11 +205,11 @@ class WikiSearchExtension(Extension):
 
         self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
 
+    @cachedmethod(lambda self: self._cache)
     def search(self, query: str) -> list[WikiPage]:
         """
         Searches wikis for the query and returns combined results from all of them
         :param query: Text to search
-        :param limit: Limit of results per website
         :return: Combined results
         """
 
@@ -238,18 +240,13 @@ class WikiSearchExtension(Extension):
             pages = cast(dict, result["query"]["pages"]).values()
 
             for page in pages:
-                wiki_page = WikiPage(
+                items.append(WikiPage(
                     wiki=wiki,
                     page_id=cast(int, page['pageid']),
                     title=cast(str, page["title"]),
                     display_title=cast(str, page["displaytitle"]),
                     extract=cast(str, page["extract"])
-                )
-
-                if self.preferences["advanced_results"]:
-                    wiki_page.to_advanced()
-
-                items.append(wiki_page)
+                ))
 
         return items
 
