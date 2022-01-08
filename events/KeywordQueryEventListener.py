@@ -8,6 +8,8 @@ from ulauncher.api.shared.action.RenderResultListAction import RenderResultListA
 from ulauncher.api.shared.event import KeywordQueryEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
+from utils.ResultList import ResultList
+
 if TYPE_CHECKING:
     from main import WikiSearchExtension
 
@@ -25,22 +27,25 @@ class KeywordQueryEventListener(EventListener):
         :return: List of actions to render
         """
 
-        results = []
         query = event.get_argument()
-        pages = extension.search(query) if query else []
+        results = ResultList(query or "", min_score=60, limit=8)
 
-        if len(pages) == 0:
-            results.append(
+        if query:
+            results.extend(extension.search(query))
+
+        items = []
+        if len(results) == 0:
+            items.append(
                 ExtensionResultItem(
                     icon=extension.get_base_icon(),
                     name="No results found",
                     on_enter=HideWindowAction()
                 )
             )
-            return RenderResultListAction(results)
+            return RenderResultListAction(items)
 
-        for page in pages:
-            results.append(
+        for page in results:
+            items.append(
                 ExtensionResultItem(
                     name=page.title,
                     description=f"{page.wiki.site['sitename']} - {page.description}",
@@ -49,4 +54,4 @@ class KeywordQueryEventListener(EventListener):
                 )
             )
 
-        return RenderResultListAction(results)
+        return RenderResultListAction(items)

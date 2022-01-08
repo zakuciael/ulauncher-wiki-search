@@ -22,6 +22,8 @@ class WikiPage:
     display_title: str
     description: str
 
+    _score: int = 0
+
     # pylint: disable=too-many-arguments
     def __init__(self, wiki: API, page_id: int, title: str, display_title: str,
                  extract: str) -> None:

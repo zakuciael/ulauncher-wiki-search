@@ -206,7 +206,7 @@ class WikiSearchExtension(Extension):
 
         self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
 
-    @cachedmethod(lambda self: self._cache, lambda self, query: hashkey(query.lower()))
+    @cachedmethod(lambda self: self._cache, lambda self, query: hashkey(query.lower().strip()))
     def search(self, query: str) -> list[WikiPage]:
         """
         Searches wikis for the query and returns combined results from all of them
