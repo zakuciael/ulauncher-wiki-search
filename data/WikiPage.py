@@ -31,7 +31,9 @@ class WikiPage:
         self.title = title
         self.display_title = display_title
         self.description = self._escape_formatting(extract)
-        self.icon = None
+
+        if self.description == "...":
+            self.description = "No description"
 
     @staticmethod
     def _escape_formatting(text: str):
