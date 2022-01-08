@@ -8,8 +8,9 @@ from urllib.parse import ParseResult as URL, urlparse
 import requests
 import validators
 from bs4 import BeautifulSoup
-# noinspection PyPep8Naming
 from cachetools import LRUCache, cachedmethod
+from cachetools.keys import hashkey
+# noinspection PyPep8Naming
 from mwclient import Site as API
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.shared.event import KeywordQueryEvent, PreferencesUpdateEvent, PreferencesEvent
@@ -205,7 +206,7 @@ class WikiSearchExtension(Extension):
 
         self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
 
-    @cachedmethod(lambda self: self._cache)
+    @cachedmethod(lambda self: self._cache, lambda self, query: hashkey(query.lower()))
     def search(self, query: str) -> list[WikiPage]:
         """
         Searches wikis for the query and returns combined results from all of them
