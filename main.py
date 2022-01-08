@@ -234,7 +234,8 @@ class WikiSearchExtension(Extension):
                 gsrlimit=5
             )
 
-            if not result["query"] or not result["query"]["pages"]:
+            if "query" not in result or not result["query"] or "pages" not in result["query"] or \
+                    not result["query"]["pages"]:
                 continue
 
             pages = cast(dict, result["query"]["pages"]).values()
