@@ -8,8 +8,6 @@ from ulauncher.api.shared.action.RenderResultListAction import RenderResultListA
 from ulauncher.api.shared.event import KeywordQueryEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
-from utils.ResultList import ResultList
-
 if TYPE_CHECKING:
     from main import WikiSearchExtension
 
@@ -28,24 +26,21 @@ class KeywordQueryEventListener(EventListener):
         """
 
         query = event.get_argument()
-        results = ResultList(query or "", limit=8)
+        pages = extension.search(query) if query else None
 
-        if query:
-            results.extend(extension.search(query))
-
-        items = []
-        if len(results) == 0:
-            items.append(
+        results = []
+        if not pages or len(pages) == 0:
+            results.append(
                 ExtensionResultItem(
                     icon=extension.get_base_icon(),
                     name="No results found",
                     on_enter=HideWindowAction()
                 )
             )
-            return RenderResultListAction(items)
+            return RenderResultListAction(results)
 
-        for page in results:
-            items.append(
+        for page in pages:
+            results.append(
                 ExtensionResultItem(
                     name=page.title,
                     description=f"{page.wiki.site['sitename']} - {page.description}",
@@ -54,4 +49,4 @@ class KeywordQueryEventListener(EventListener):
                 )
             )
 
-        return RenderResultListAction(items)
+        return RenderResultListAction(results)

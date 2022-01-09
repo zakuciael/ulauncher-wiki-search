@@ -9,12 +9,14 @@ from urllib.parse import ParseResult as URL, quote as encodeURL
 # noinspection PyPep8Naming
 from mwclient import Site as API
 
+from utils.ScorableItem import ScorableItem
+
 TITLE_SAFE_CHARACTERS = "/ "
 SPACE_REPLACEMENT = "_"
 
 
 # pylint: disable=too-few-public-methods
-class WikiPage:
+class WikiPage(ScorableItem):
     """ Holds data used to identify wiki pages """
     wiki: API
     page_id: int
@@ -40,6 +42,9 @@ class WikiPage:
     @staticmethod
     def _escape_formatting(text: str):
         return re.sub(r"\s+", " ", text).strip()
+
+    def _get_score_fields(self) -> list[str]:
+        return [self.title, self.description]
 
     def to_url(self) -> str:
         """

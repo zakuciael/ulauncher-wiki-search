@@ -21,6 +21,7 @@ from data.WikiPage import WikiPage
 from events.KeywordQueryEventListener import KeywordQueryEventListener
 from events.PreferencesEventListener import PreferencesEventListener
 from events.PreferencesUpdateEventListener import PreferencesUpdateEventListener
+from utils.SortedList import SortedList
 
 
 class WikiSearchExtension(Extension):
@@ -209,14 +210,14 @@ class WikiSearchExtension(Extension):
         self.logger.info("Parsing completed, resolved %s/%s URLs", len(endpoints), len(matches))
 
     @cachedmethod(lambda self: self._cache, lambda self, query: hashkey(query.lower().strip()))
-    def search(self, query: str) -> list[WikiPage]:
+    def search(self, query: str) -> SortedList[WikiPage]:
         """
         Searches wikis for the query and returns combined results from all of them
         :param query: Text to search
         :return: Combined results
         """
 
-        items = []
+        pages = SortedList[WikiPage](query, min_score=30, limit=8)
         for wiki in self._apis.values():
             result = wiki.get(
                 # Basic Options
@@ -242,25 +243,25 @@ class WikiSearchExtension(Extension):
                     not result["query"]["pages"]:
                 continue
 
-            pages = cast(dict, result["query"]["pages"]).values()
+            raw_pages = cast(dict, result["query"]["pages"]).values()
 
-            for page in pages:
-                title = cast(str, page["title"])
+            for raw_page in raw_pages:
+                title = cast(str, raw_page["title"])
 
                 if title == cast(str, wiki.site["mainpage"]):
                     continue
 
-                items.append(
+                pages.append(
                     WikiPage(
                         wiki=wiki,
-                        page_id=cast(int, page['pageid']),
+                        page_id=cast(int, raw_page['pageid']),
                         title=title,
-                        display_title=cast(str, page["displaytitle"]),
-                        extract=cast(str, page["extract"])
+                        display_title=cast(str, raw_page["displaytitle"]),
+                        extract=cast(str, raw_page["extract"])
                     )
                 )
 
-        return items
+        return pages
 
 
 if __name__ == "__main__":
