@@ -19,8 +19,8 @@
       "id": "wiki_urls",
       "type": "text",
       "name": "Wiki URLs",
-      "description": "List of wikis urls that you want to search. Example format: https://en.wikipedia.org/ | https://witcher.fandom.com/",
-      "default_value": "https://en.wikipedia.org/ | https://witcher.fandom.com/"
+      "description": "List of wikis urls that you want to search. Example format: https://en.wikipedia.org/ | witcher.fandom.com",
+      "default_value": "https://en.wikipedia.org/ | witcher.fandom.com"
     }
   ]
 }
