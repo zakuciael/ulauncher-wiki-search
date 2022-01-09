@@ -19,5 +19,7 @@ class PreferencesEventListener(EventListener):
         :param extension: Extension class
         """
 
+        event.preferences["improved_titles"] = event.preferences["improved_titles"] == "True"
         extension.preferences.update(event.preferences)
+
         extension.parse_wiki_urls(event.preferences.get("wiki_urls"))

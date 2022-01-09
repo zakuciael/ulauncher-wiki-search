@@ -139,9 +139,6 @@ class WikiSearchExtension(Extension):
             return None
 
         # Final part, let's resolve the actual API endpoint
-
-        # TODO: Resolve user supplied path
-
         # First let's check common websites
         known_api_endpoint = next(endpoint_data for endpoint_data in KNOWN_API_ENDPOINTS if
                                   endpoint_data.regex.match(cast(str, url.hostname)))
@@ -247,6 +244,7 @@ class WikiSearchExtension(Extension):
 
             for raw_page in raw_pages:
                 title = cast(str, raw_page["title"])
+                display_title = cast(str, raw_page["displaytitle"])
 
                 if title == cast(str, wiki.site["mainpage"]):
                     continue
@@ -256,7 +254,7 @@ class WikiSearchExtension(Extension):
                         wiki=wiki,
                         page_id=cast(int, raw_page['pageid']),
                         title=title,
-                        display_title=cast(str, raw_page["displaytitle"]),
+                        display_title=display_title,
                         extract=cast(str, raw_page["extract"])
                     )
                 )

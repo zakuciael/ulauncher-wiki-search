@@ -40,9 +40,12 @@ class KeywordQueryEventListener(EventListener):
             return RenderResultListAction(results)
 
         for page in pages:
+            title = page.improve_title(page.display_title) if extension.preferences[
+                "improved_titles"] else page.display_title
+
             results.append(
                 ExtensionResultItem(
-                    name=page.title,
+                    name=title,
                     description=f"{page.wiki.site['sitename']} - {page.description}",
                     icon=extension.get_base_icon(),
                     on_enter=OpenUrlAction(page.to_url())

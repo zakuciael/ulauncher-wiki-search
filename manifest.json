@@ -21,6 +21,23 @@
       "name": "Wiki URLs",
       "description": "List of wikis urls that you want to search. Example format: https://en.wikipedia.org/ | witcher.fandom.com",
       "default_value": "https://en.wikipedia.org/ | witcher.fandom.com"
+    },
+    {
+      "id": "improved_titles",
+      "type": "select",
+      "name": "(Experimental) Improved titles",
+      "description": "Changes titles to increase readability. Warning: May produce invalid titles in the process",
+      "default_value": "False",
+      "options": [
+        {
+          "text": "Enabled",
+          "value": "True"
+        },
+        {
+          "text": "Disabled",
+          "value": "False"
+        }
+      ]
     }
   ]
 }
