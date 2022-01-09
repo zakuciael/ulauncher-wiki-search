@@ -228,7 +228,7 @@ class WikiSearchExtension(Extension):
                 # Info Options
                 inprop="displaytitle",
                 # Extracts Options
-                exchars=40,
+                exchars=50,
                 exintro=True,
                 explaintext=True,
                 exsectionformat="raw",
