@@ -234,6 +234,7 @@ class WikiSearchExtension(Extension):
                 exsectionformat="raw",
                 # Generator Options
                 gsrsearch=query,
+                gsrnamespace="*",
                 gsrlimit=5
             )
 
