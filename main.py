@@ -266,7 +266,7 @@ class WikiSearchExtension(Extension):
                 pages.append(
                     WikiPage(
                         wiki=wiki,
-                        page_id=cast(int, raw_page['pageid']),
+                        id=cast(int, raw_page['pageid']),
                         title=title,
                         display_title=display_title,
                         extract=cast(str, raw_page["extract"])

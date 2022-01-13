@@ -15,11 +15,12 @@ TITLE_SAFE_CHARACTERS = "/ "
 SPACE_REPLACEMENT = "_"
 
 
-# pylint: disable=too-few-public-methods
+# noinspection PyShadowingBuiltins
+# pylint: disable=too-few-public-methods,redefined-builtin
 class WikiPage(ScorableItem):
     """ Holds data used to identify wiki pages """
     wiki: API
-    page_id: int
+    id: int
     title: str
     display_title: str
     description: str
@@ -27,11 +28,10 @@ class WikiPage(ScorableItem):
     _score: int = 0
 
     # pylint: disable=too-many-arguments
-    def __init__(self, wiki: API, page_id: int, title: str, display_title: str,
-                 extract: str) -> None:
+    def __init__(self, wiki: API, id: int, title: str, display_title: str, extract: str) -> None:
         super().__init__()
         self.wiki = wiki
-        self.page_id = page_id
+        self.id = id
         self.title = title
         self.display_title = display_title
         self.description = self._escape_formatting(extract)
