@@ -10,17 +10,17 @@ import validators
 from bs4 import BeautifulSoup
 from cachetools import LRUCache, cachedmethod
 from cachetools.keys import hashkey
-# noinspection PyPep8Naming
-from mwclient import Site as API
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.shared.event import KeywordQueryEvent, PreferencesUpdateEvent, PreferencesEvent
 
 from data import MEDIA_WIKI_DETECTION_REGEXES_META, MEDIA_WIKI_DETECTION_REGEXES_CONTENT, \
-    COMMON_API_ENDPOINTS, KNOWN_API_ENDPOINTS, MEDIA_WIKI_USER_AGENT
+    COMMON_API_ENDPOINTS, KNOWN_API_ENDPOINTS, MEDIA_WIKI_USER_AGENT, TITLE_READABILITY_IMPROVEMENTS
 from data.WikiPage import WikiPage
 from events.KeywordQueryEventListener import KeywordQueryEventListener
 from events.PreferencesEventListener import PreferencesEventListener
 from events.PreferencesUpdateEventListener import PreferencesUpdateEventListener
+# noinspection PyPep8Naming
+from utils.API import API
 from utils.SortedList import SortedList
 
 
@@ -218,13 +218,18 @@ class WikiSearchExtension(Extension):
         pages = SortedList[WikiPage](query, min_score=60, limit=8)
 
         for wiki in self._apis.values():
+            namespaces = list((
+                cast(int, namespace["id"])
+                for namespace in cast(dict, wiki.namespaces.values()) if "content" in namespace
+            ))
+
             result = wiki.get(
                 # Basic Options
                 action="query",
                 prop="pageprops|extracts|info",
                 generator="search",
                 # Page Props Options
-                ppprop="description|displaytitle",
+                ppprop="displaytitle",
                 # Info Options
                 inprop="displaytitle",
                 # Extracts Options
@@ -234,8 +239,8 @@ class WikiSearchExtension(Extension):
                 exsectionformat="raw",
                 # Generator Options
                 gsrsearch=query,
-                gsrnamespace="*",
-                gsrlimit=5
+                gsrnamespace="|".join(map(str, namespaces)),
+                gsrlimit=10
             )
 
             if "query" not in result or not result["query"] or "pages" not in result["query"] or \
