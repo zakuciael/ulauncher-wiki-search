@@ -1,7 +1,7 @@
 """ Contains constants for the project """
 
 import re
-from typing import Pattern
+from typing import Pattern, TypedDict
 
 from data.KnownApiEndpoint import KnownApiEndpoint
 
@@ -33,4 +33,11 @@ KNOWN_API_ENDPOINTS: list[KnownApiEndpoint] = [
         regex=re.compile(r"^.+\.mediawiki.org$", re.IGNORECASE),
         path="/w/"
     )
+]
+
+Improvement = TypedDict("Improvement", {"regex": Pattern[str], "replacement": str})
+
+TITLE_READABILITY_IMPROVEMENTS: list[Improvement] = [
+    {"regex": re.compile(r":"), "replacement": ": "},
+    {"regex": re.compile(r"/"), "replacement": " - "}
 ]

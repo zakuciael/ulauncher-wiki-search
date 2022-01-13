@@ -14,11 +14,6 @@ from utils.ScorableItem import ScorableItem
 TITLE_SAFE_CHARACTERS = "/ "
 SPACE_REPLACEMENT = "_"
 
-TITLE_READABILITY_IMPROVEMENTS = [
-    {"regex": re.compile(r":"), "replacement": ": "},
-    {"regex": re.compile(r"/"), "replacement": " - "}
-]
-
 
 # pylint: disable=too-few-public-methods
 class WikiPage(ScorableItem):
@@ -47,19 +42,6 @@ class WikiPage(ScorableItem):
     @staticmethod
     def _escape_formatting(text: str):
         return re.sub(r"\s+", " ", text).strip()
-
-    @staticmethod
-    def improve_title(title: str) -> str:
-        """
-        Improves title readability
-        :param title: Title to improve
-        :return: Improved title
-        """
-
-        for settings in TITLE_READABILITY_IMPROVEMENTS:
-            title = settings["regex"].sub(settings["replacement"], title)
-
-        return title
 
     def _get_score_fields(self) -> list[str]:
         return [self.title, self.description]

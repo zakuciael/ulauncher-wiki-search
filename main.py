@@ -249,6 +249,13 @@ class WikiSearchExtension(Extension):
                 if title == cast(str, wiki.site["mainpage"]):
                     continue
 
+                if self.preferences["improved_titles"]:
+                    for improvement in TITLE_READABILITY_IMPROVEMENTS:
+                        display_title = improvement["regex"].sub(
+                            improvement["replacement"],
+                            display_title
+                        )
+
                 pages.append(
                     WikiPage(
                         wiki=wiki,
