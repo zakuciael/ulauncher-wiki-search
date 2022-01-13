@@ -215,7 +215,8 @@ class WikiSearchExtension(Extension):
         :return: Combined results
         """
 
-        pages = SortedList[WikiPage](query, min_score=30, limit=8)
+        pages = SortedList[WikiPage](query, min_score=60, limit=8)
+
         for wiki in self._apis.values():
             result = wiki.get(
                 # Basic Options
