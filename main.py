@@ -218,9 +218,9 @@ class WikiSearchExtension(Extension):
         pages = SortedList[WikiPage](query, min_score=60, limit=8)
 
         for wiki in self._apis.values():
-            namespaces = list((
-                cast(int, namespace["id"])
-                for namespace in cast(dict, wiki.namespaces.values()) if "content" in namespace
+            namespaces = list(filter(
+                lambda namespace: namespace.has_content,
+                wiki.namespaces.values()
             ))
 
             result = wiki.get(
@@ -239,7 +239,7 @@ class WikiSearchExtension(Extension):
                 exsectionformat="raw",
                 # Generator Options
                 gsrsearch=query,
-                gsrnamespace="|".join(map(str, namespaces)),
+                gsrnamespace="|".join(map(lambda namespace: str(namespace.id), namespaces)),
                 gsrlimit=10
             )
 
@@ -252,6 +252,8 @@ class WikiSearchExtension(Extension):
             for raw_page in raw_pages:
                 title = cast(str, raw_page["title"])
                 display_title = cast(str, raw_page["displaytitle"])
+                namespace = next((namespace.name for namespace in namespaces
+                                  if namespace.id == raw_page["ns"]), None)
 
                 if title == cast(str, wiki.site["mainpage"]):
                     continue
@@ -263,13 +265,17 @@ class WikiSearchExtension(Extension):
                             display_title
                         )
 
+                        # Strip namespace from the title
+                        if namespace:
+                            display_title = re.sub(rf"{namespace}:\s+", "", display_title)
+
                 pages.append(
                     WikiPage(
                         wiki=wiki,
                         id=cast(int, raw_page['pageid']),
                         title=title,
                         display_title=display_title,
-                        extract=cast(str, raw_page["extract"])
+                        namespace=namespace or "Unknown"
                     )
                 )
 

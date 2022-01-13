@@ -23,28 +23,21 @@ class WikiPage(ScorableItem):
     id: int
     title: str
     display_title: str
-    description: str
+    namespace: str
 
     _score: int = 0
 
     # pylint: disable=too-many-arguments
-    def __init__(self, wiki: API, id: int, title: str, display_title: str, extract: str) -> None:
+    def __init__(self, wiki: API, id: int, title: str, display_title: str, namespace: str) -> None:
         super().__init__()
         self.wiki = wiki
         self.id = id
         self.title = title
         self.display_title = display_title
-        self.description = self._escape_formatting(extract)
-
-        if not self.description or self.description == "...":
-            self.description = "No description"
-
-    @staticmethod
-    def _escape_formatting(text: str):
-        return re.sub(r"\s+", " ", text).strip()
+        self.namespace = namespace
 
     def _get_score_fields(self) -> list[str]:
-        return [self.title, self.description]
+        return [self.title]
 
     def to_url(self) -> str:
         """

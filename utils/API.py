@@ -2,13 +2,16 @@
 
 from mwclient import Site
 
+from data.WikiNamespace import WikiNamespace
+
 
 # noinspection PyAttributeOutsideInit
 # pylint: disable=too-many-instance-attributes
 class API(Site):
     """ Class extending mwclient's Site class to provide more functionality """
 
-    default_namespaces: dict = {}
+    default_namespaces: dict[int, WikiNamespace] = {}
+    namespaces: dict[int, WikiNamespace] = {}
 
     def site_init(self):
         if self.initialized:
@@ -26,7 +29,14 @@ class API(Site):
 
         # Extract site info
         self.site = meta['query']['general']
-        self.namespaces = meta['query']['namespaces']
+        self.namespaces = {
+            namespace['id']: WikiNamespace(
+                namespace["id"],
+                "Main" if not namespace["*"] and namespace["id"] == 0 else namespace["*"],
+                "content" in namespace
+            )
+            for namespace in meta['query']['namespaces'].values()
+        }
         self.writeapi = 'writeapi' in self.site
 
         self.version = self.version_tuple_from_generator(self.site['generator'])
