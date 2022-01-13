@@ -181,6 +181,7 @@ class WikiSearchExtension(Extension):
 
         for url in matches:
             self.logger.debug("Resolving API endpoint for %s", url.netloc)
+            endpoint: API | None = None
 
             if self._apis.get(url.netloc):
                 endpoint = cast(API, self._apis.get(url.netloc))
