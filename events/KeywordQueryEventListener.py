@@ -45,7 +45,7 @@ class KeywordQueryEventListener(EventListener):
                     name=page.display_title,
                     description=f"{page.wiki.site['sitename']} - {page.namespace}",
                     icon=extension.get_base_icon(),
-                    on_enter=OpenUrlAction(page.to_url())
+                    on_enter=OpenUrlAction(page.url)
                 )
             )
 
