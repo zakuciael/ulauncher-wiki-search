@@ -219,27 +219,25 @@ class WikiSearchExtension(Extension):
 
         for wiki in self._apis.values():
             namespaces = list(filter(
-                lambda namespace: namespace.has_content,
+                lambda value: value.has_content,
                 wiki.namespaces.values()
             ))
 
             result = wiki.get(
                 # Basic Options
                 action="query",
-                prop="pageprops|extracts|info",
+                prop=["categories", "langlinks", "info"],
                 generator="search",
-                # Page Props Options
-                ppprop="displaytitle",
+                # Categories Options
+                cllimit=500,
+                # Language Links Options
+                lllang="en",
+                lllimit=500,
                 # Info Options
-                inprop="displaytitle",
-                # Extracts Options
-                exchars=50,
-                exintro=True,
-                explaintext=True,
-                exsectionformat="raw",
+                inprop=["displaytitle", "url"],
                 # Generator Options
                 gsrsearch=query,
-                gsrnamespace="|".join(map(lambda namespace: str(namespace.id), namespaces)),
+                gsrnamespace=list(map(lambda value: value.id, namespaces)),
                 gsrlimit=10
             )
 
@@ -272,10 +270,11 @@ class WikiSearchExtension(Extension):
                 pages.append(
                     WikiPage(
                         wiki=wiki,
-                        id=cast(int, raw_page['pageid']),
+                        id=cast(int, raw_page["pageid"]),
                         title=title,
                         display_title=display_title,
-                        namespace=namespace or "Unknown"
+                        namespace=namespace or "Unknown",
+                        url=cast(str, raw_page["fullurl"])
                     )
                 )
 
