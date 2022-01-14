@@ -54,3 +54,13 @@ class API(Site):
         self.groups = userinfo.get("groups", [])
         self.rights = userinfo.get("rights", [])
         self.initialized = True
+
+    # pylint: disable=keyword-arg-before-vararg
+    def api(self, action, http_method="POST", *args, **kwargs):
+        for key, value in kwargs.items():
+            if isinstance(value, list):
+                kwargs[key] = "|".join(map(str, value))
+            if isinstance(value, bool):
+                kwargs[key] = "true" if value else "false"
+
+        return super().api(action, http_method, *args, **kwargs)
