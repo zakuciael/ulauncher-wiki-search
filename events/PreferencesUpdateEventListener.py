@@ -26,4 +26,7 @@ class PreferencesUpdateEventListener(EventListener):
         if event.id == "improved_titles":
             event.new_value = event.new_value == "True"
 
+        if event.id == "improved_filters":
+            event.new_value = event.new_value == "True"
+
         extension.preferences[event.id] = event.new_value

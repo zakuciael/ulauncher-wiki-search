@@ -38,6 +38,23 @@
           "value": "False"
         }
       ]
+    },
+    {
+      "id": "improved_filters",
+      "type": "select",
+      "name": "(Experimental) Improved filters",
+      "description": "Filters out pages that might not be desired. Warning: May hide important pages in the process",
+      "default_value": "False",
+      "options": [
+        {
+          "text": "Enabled",
+          "value": "True"
+        },
+        {
+          "text": "Disabled",
+          "value": "False"
+        }
+      ]
     }
   ]
 }

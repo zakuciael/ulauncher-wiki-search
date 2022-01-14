@@ -253,8 +253,25 @@ class WikiSearchExtension(Extension):
                 namespace = next((namespace.name for namespace in namespaces
                                   if namespace.id == raw_page["ns"]), None)
 
-                if title == cast(str, wiki.site["mainpage"]):
-                    continue
+                if self.preferences["improved_filters"]:
+                    # Filter main page
+                    if title == cast(str, wiki.site["mainpage"]):
+                        continue
+
+                    # Filter translation pages
+                    if len(raw_page["langlinks"] if "langlinks" in raw_page else []) > 0:
+                        continue
+
+                    # Filter formatting pages
+                    formatting_category = next((category for category in (
+                        cast(list, raw_page["categories"]) if "categories" in raw_page else []
+                    ) if re.match(
+                        r"(?:Category:)?Format(?:ting)?(?:\s+)?subpage(?:s)?",
+                        category["title"]
+                    )), None)
+
+                    if formatting_category:
+                        continue
 
                 if self.preferences["improved_titles"]:
                     for improvement in TITLE_READABILITY_IMPROVEMENTS:
