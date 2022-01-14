@@ -130,9 +130,9 @@ class WikiSearchExtension(Extension):
             regex.findall(res.text) for regex in MEDIA_WIKI_DETECTION_REGEXES_CONTENT)
 
         if not media_wiki:
-            soup = BeautifulSoup(res.text, 'html.parser')
+            soup = BeautifulSoup(res.text, "html.parser")
             media_wiki = any(regex.match(
-                (soup.find("meta", attrs={'name': key}) or {}).get("content") or ""
+                (soup.find("meta", attrs={"name": key}) or {}).get("content") or ""
             ) for key, regex in MEDIA_WIKI_DETECTION_REGEXES_META.items())
 
         if not media_wiki:
