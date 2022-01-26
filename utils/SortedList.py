@@ -1,5 +1,5 @@
 """ Contains custom implementation of SortedList found in Ulauncher's code """
-from typing import Iterator, TypeVar, Generic
+from typing import Iterator, TypeVar, Generic, List
 
 from ulauncher.utils.SortedCollection import SortedCollection  # type: ignore
 from ulauncher.utils.fuzzy_search import get_score  # type: ignore
@@ -48,7 +48,7 @@ class SortedList(Generic[T]):
     def __contains__(self, item: T) -> bool:
         return item in self._items
 
-    def extend(self, items: list[T]) -> None:
+    def extend(self, items: List[T]) -> None:
         """
         Merges all provided items into this list
         :param items: A list of items to merge

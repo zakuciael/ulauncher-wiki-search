@@ -1,4 +1,5 @@
 """ Contains class extending mwclient's Site class to add more functionality """
+from typing import Dict
 
 from mwclient import Site
 
@@ -10,8 +11,8 @@ from data.WikiNamespace import WikiNamespace
 class API(Site):
     """ Class extending mwclient's Site class to provide more functionality """
 
-    default_namespaces: dict[int, WikiNamespace] = {}
-    namespaces: dict[int, WikiNamespace] = {}
+    default_namespaces: Dict[int, WikiNamespace] = {}
+    namespaces: Dict[int, WikiNamespace] = {}
 
     def site_init(self):
         if self.initialized:

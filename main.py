@@ -1,7 +1,9 @@
 """ Ulauncher extension that lets you search and open MediaWiki pages """
+from __future__ import annotations
+
 import os
 import re
-from typing import cast
+from typing import cast, Dict
 # noinspection PyPep8Naming
 from urllib.parse import ParseResult as URL, urlparse
 
@@ -27,7 +29,7 @@ from utils.SortedList import SortedList
 class WikiSearchExtension(Extension):
     """ Main Extension Class  """
 
-    _apis: dict[str, API] = {}
+    _apis: Dict[str, API] = {}
     _cache: LRUCache = LRUCache(maxsize=32)
 
     def __init__(self):
