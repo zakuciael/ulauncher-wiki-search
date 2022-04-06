@@ -40,6 +40,7 @@ open <a href="https://www.mediawiki.org/wiki/MediaWiki" target="_blank">MediaWik
 - requests >= 2.27.1
 - cachetools >= 5.0.0
 - mwclient >= 0.10.1
+- typing-extensions >= 4.1.1
 
 To install this extension:
 
