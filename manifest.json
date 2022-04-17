@@ -11,7 +11,7 @@
     {
       "id": "global_keyword",
       "type": "keyword",
-      "name": "Global keyword",
+      "name": "Global",
       "description": "Global keyword used by the extension",
       "default_value": "wiki"
     },
